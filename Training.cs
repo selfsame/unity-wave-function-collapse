@@ -59,7 +59,7 @@ class Training : MonoBehaviour{
 				counts[o] = 1;
 				string assetpath = AssetPath(o);
 				string sym = "X";
-				string last = assetpath.Substring(o.name.Length - 1);
+				string last = assetpath.Substring(assetpath.Length - 1);
 				if (last == "X" || last == "I" || last == "L" || last == "T" || last == "/"){
 					sym = last;
 				}

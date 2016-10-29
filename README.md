@@ -2,7 +2,17 @@
 
 A fork of [https://github.com/mxgmn/WaveFunctionCollapse](https://github.com/mxgmn/WaveFunctionCollapse) with tools for the Unity Game engine.
 
+# Installation
+
+Clone this repo under your projets `Assets` directory, or import a unity package asset from
+[http://selfsame.itch.io/unitywfc](http://selfsame.itch.io/unitywfc).
+
 # Usage
+
+## video tutorial
+
+[https://www.youtube.com/watch?v=CTJJrC3BAGM](https://www.youtube.com/watch?v=CTJJrC3BAGM)
+
 
 ## Training
 
