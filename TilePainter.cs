@@ -10,7 +10,7 @@ using UnityEditor;
 [RequireComponent(typeof(BoxCollider))]
 public class TilePainter : MonoBehaviour{
 
-	public int gridsize = 2;
+	public int gridsize = 1;
 	public int width = 20;
 	public int height = 20;
 	public GameObject tiles;

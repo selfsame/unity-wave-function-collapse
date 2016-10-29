@@ -7,12 +7,11 @@ using UnityEditor;
 using System.Collections.Generic;
 
 class Training : MonoBehaviour{
-	public int gridsize = 2;
+	public int gridsize = 1;
 	public int width = 12;
 	public int depth = 12;
 	public UnityEngine.Object[] tiles = new UnityEngine.Object[0];
 	public int[] RS = new int[0];
-	public float[] weights = new float[0];
 	public Dictionary<string, byte> str_tile;
 	Dictionary<string, int[]> neighbors;
 	public byte[,] sample; 
@@ -44,7 +43,7 @@ class Training : MonoBehaviour{
 				}
 			}
 		}
-		 System.IO.File.WriteAllText(Application.dataPath+"/"+this.gameObject.name+".xml", NeighborXML());
+		System.IO.File.WriteAllText(Application.dataPath+"/"+this.gameObject.name+".xml", NeighborXML());
 	}
 
 	public string AssetPath(UnityEngine.Object o){
@@ -64,7 +63,7 @@ class Training : MonoBehaviour{
 				if (last == "X" || last == "I" || last == "L" || last == "T" || last == "/"){
 					sym = last;
 				}
-				res += "<tile name=\""+assetpath+"\" symmetry=\""+sym+"\" weight=\""+weights[i]+"\"/>\n";
+				res += "<tile name=\""+assetpath+"\" symmetry=\""+sym+"\" weight=\"1.0\"/>\n";
 			}
 		}
 		res += "	</tiles>\n<neighbors>";
@@ -94,7 +93,6 @@ class Training : MonoBehaviour{
 		int cnt = this.transform.childCount;
 		tiles = new UnityEngine.Object[500];
 		RS = new int[500];
-		weights = new float[500];
 		tiles[0] = null;
 		RS[0] = 0;
 		for (int i = 0; i < cnt; i++){
@@ -129,7 +127,6 @@ class Training : MonoBehaviour{
 					str_tile.Add(fab.name+R, (byte)index);
 					tiles[index] = fab;
 					RS[index] = R;
-					weights[index] = 1f;
 					sample[X, Y] = str_tile[fab.name+R];
 				} else {
 					sample[X, Y] = str_tile[fab.name+R];
@@ -137,7 +134,6 @@ class Training : MonoBehaviour{
 			}
 		}
 		tiles = tiles.SubArray(0 , str_tile.Count+1);
-		weights = weights.SubArray(0 , str_tile.Count+1);
 		RS = RS.SubArray(0 , str_tile.Count+1);
 	}
 

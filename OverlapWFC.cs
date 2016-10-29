@@ -8,8 +8,7 @@ using UnityEditor;
 [ExecuteInEditMode]
 class OverlapWFC : MonoBehaviour{
 	public Training training = null;
-
-	public int gridsize = 2;
+	public int gridsize = 1;
 	public int width = 20;
 	public int depth = 20;
 	public int seed = 0;
@@ -76,7 +75,6 @@ class OverlapWFC : MonoBehaviour{
 		if (training.sample == null){
 			training.Compile();
 		}
-
 		if (output == null){
 			Transform ot = transform.Find("output-overlap");
 			if (ot != null){output = ot.gameObject;}}
@@ -93,7 +91,6 @@ class OverlapWFC : MonoBehaviour{
 		group.parent = output.transform;
 		group.position = output.transform.position;
 		group.rotation = output.transform.rotation;
-
 		rendering = new GameObject[width, depth];
 		model = new OverlappingModel(training.sample, N, width, depth, periodicInput, periodicOutput, symmetry, foundation);
 	}
@@ -125,7 +122,6 @@ class OverlapWFC : MonoBehaviour{
 				for (int x = 0; x < width; x++){
 					if (rendering[x,y] == null){
 						int v = (int)model.Sample(x, y);
-
 						if (v != 99 && v < training.tiles.Length){
 							Vector3 pos = new Vector3(x*gridsize, 0, y*gridsize);
 							int rot = (int)training.RS[v];
@@ -140,8 +136,6 @@ class OverlapWFC : MonoBehaviour{
 								rendering[x,y] = tile;
 							}
 						}
-
-
 					}
 				}
 	  		}
