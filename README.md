@@ -52,3 +52,7 @@ Note: `L` tiles have an initial orientation of
 OO
 OX
 ```
+
+## API
+
+Both models have a `public GameObject[,] rendering;` 2d array that stores their output.
