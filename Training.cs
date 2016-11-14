@@ -47,7 +47,11 @@ class Training : MonoBehaviour{
 	}
 
 	public string AssetPath(UnityEngine.Object o){
+		#if UNITY_EDITOR
 		return AssetDatabase.GetAssetPath(o).Trim().Replace("Assets/Resources/", "").Replace(".prefab", "");
+		#else
+		return "";
+		#endif
 	}
 
 	public string NeighborXML(){
