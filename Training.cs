@@ -104,7 +104,7 @@ class Training : MonoBehaviour{
 			Vector3 tilepos = tile.transform.localPosition;
 			
 			if ((tilepos.x > -0.55f) && (tilepos.x <= width*gridsize-0.55f) &&
-				  (tilepos.z > -0.55f) && (tilepos.z <= depth*gridsize-0.55f)){
+				  (tilepos.y > -0.55f) && (tilepos.y <= depth*gridsize-0.55f)){
 				UnityEngine.Object fab = tile;
 				#if UNITY_EDITOR
 				fab = PrefabUtility.GetPrefabParent(tile);
@@ -123,8 +123,8 @@ class Training : MonoBehaviour{
 				tile.name = fab.name;
 				#endif
 				int X = (int)(tilepos.x) / gridsize;
-				int Y = (int)(tilepos.z) / gridsize;
-				int R = (int)(tile.transform.localEulerAngles.y)/ 90;
+				int Y = (int)(tilepos.y) / gridsize;
+				int R = (int)(tile.transform.localEulerAngles.z)/ 90;
 				if (R == 4) {R = 0;};
 				if (!str_tile.ContainsKey(fab.name+R)){
 					int index = str_tile.Count+1;
@@ -144,14 +144,14 @@ class Training : MonoBehaviour{
 	void OnDrawGizmos(){
 		Gizmos.matrix = transform.localToWorldMatrix;
 		Gizmos.color = Color.magenta;
-		Gizmos.DrawWireCube(new Vector3((width*gridsize/2f)-gridsize*0.5f, 0, (depth*gridsize/2f)-gridsize*0.5f),
-							new Vector3(width*gridsize, gridsize, depth*gridsize));
+		Gizmos.DrawWireCube(new Vector3((width*gridsize/2f)-gridsize*0.5f, (depth*gridsize/2f)-gridsize*0.5f, 0f),
+							new Vector3(width*gridsize, depth*gridsize, gridsize));
 		Gizmos.color = Color.cyan;
 		for (int i = 0; i < this.transform.childCount; i++){
 			GameObject tile = this.transform.GetChild(i).gameObject;
 			Vector3 tilepos = tile.transform.localPosition;
 			if ((tilepos.x > -0.55f) && (tilepos.x <= width*gridsize-0.55f) &&
-				(tilepos.z > -0.55f) && (tilepos.z <= depth*gridsize-0.55f)){
+				(tilepos.y > -0.55f) && (tilepos.y <= depth*gridsize-0.55f)){
 				Gizmos.DrawSphere(tilepos, gridsize*0.2f);
 			}
 		}

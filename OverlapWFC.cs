@@ -69,7 +69,7 @@ class OverlapWFC : MonoBehaviour{
 	public void Generate() {
 		if (training == null){Debug.Log("Can't Generate: no designated Training component");}
 		if (IsPrefabRef(training.gameObject)){
-			GameObject o = CreatePrefab(training.gameObject, new Vector3(0,0,99999f), Quaternion.identity);
+			GameObject o = CreatePrefab(training.gameObject, new Vector3(0,99999f,0f), Quaternion.identity);
 			training = o.GetComponent<Training>();
 		}
 		if (training.sample == null){
@@ -98,7 +98,8 @@ class OverlapWFC : MonoBehaviour{
 	void OnDrawGizmos(){
 		Gizmos.color = Color.cyan;
 		Gizmos.matrix = transform.localToWorldMatrix;
-		Gizmos.DrawWireCube(new Vector3(width*gridsize/2f-gridsize*0.5f, 0, depth*gridsize/2f-gridsize*0.5f),new Vector3(width*gridsize, gridsize, depth*gridsize));
+		Gizmos.DrawWireCube(new Vector3(width*gridsize/2f-gridsize*0.5f, depth*gridsize/2f-gridsize*0.5f, 0f),
+							new Vector3(width*gridsize, depth*gridsize, gridsize));
 		if (incremental) {
 			if (model != null){
 				model.Run(1, 5);
@@ -123,7 +124,7 @@ class OverlapWFC : MonoBehaviour{
 					if (rendering[x,y] == null){
 						int v = (int)model.Sample(x, y);
 						if (v != 99 && v < training.tiles.Length){
-							Vector3 pos = new Vector3(x*gridsize, 0, y*gridsize);
+							Vector3 pos = new Vector3(x*gridsize, y*gridsize, 0f);
 							int rot = (int)training.RS[v];
 							GameObject fab = training.tiles[v] as GameObject;
 							if (fab != null){
@@ -131,7 +132,7 @@ class OverlapWFC : MonoBehaviour{
 								Vector3 fscale = tile.transform.localScale;
 								tile.transform.parent = group;
 								tile.transform.localPosition = pos;
-								tile.transform.localEulerAngles = new Vector3(0, rot*90, 0);
+								tile.transform.localEulerAngles = new Vector3(0, 0, rot*90);
 								tile.transform.localScale = fscale;
 								rendering[x,y] = tile;
 							}
