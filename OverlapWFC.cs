@@ -12,7 +12,7 @@ class OverlapWFC : MonoBehaviour{
 	public int width = 20;
 	public int depth = 20;
 	public int seed = 0;
-	[HideInInspector]
+	//[HideInInspector]
 	public int N = 2;
 	public bool periodicInput = false;
 	public bool periodicOutput = false;
@@ -113,6 +113,10 @@ class OverlapWFC : MonoBehaviour{
 		if (model.Run(seed, iterations)){
 			Draw();
 		}
+	}
+
+	public GameObject GetTile(int x, int y){
+		return rendering[x,y];
 	}
 
 	public void Draw(){
