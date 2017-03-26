@@ -17,9 +17,8 @@ public class SimpleTiledModel : Model
 	public List<string> tiles;
 
 	public SimpleTiledModel(string name, string subsetName, int width, int height, bool periodic)
-	{
-		FMX = width;
-		FMY = height;
+        :base(width,height)
+    {
 		this.periodic = periodic;
 
 		var xdoc = new XmlDocument();
@@ -137,16 +136,9 @@ public class SimpleTiledModel : Model
 			for (int t = 0; t < T; t++) propagator[d][t] = new bool[T];
 		}
 
-		wave = new bool[FMX][][];
-		changes = new bool[FMX][];
-		for (int x = 0; x < FMX; x++)
-		{
-			wave[x] = new bool[FMY][];
-			changes[x] = new bool[FMY];
-			for (int y = 0; y < FMY; y++) wave[x][y] = new bool[T];
-		}
+        for (int x = 0; x < FMX; x++) for (int y = 0; y < FMY; y++) wave[x][y] = new bool[T];
 
-		foreach (XmlNode xneighbor in xnode.NextSibling.ChildNodes)
+        foreach (XmlNode xneighbor in xnode.NextSibling.ChildNodes)
 		{
 			string[] left = xneighbor.Get<string>("left").Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 			string[] right = xneighbor.Get<string>("right").Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
@@ -228,7 +220,7 @@ public class SimpleTiledModel : Model
 							for (int t1 = 0; t1 < T && !b; t1++) if (w1[t1]) b = prop[t1];
 							if (!b)
 							{
-								wave[x2][y2][t2] = false;
+								w2[t2] = false;
 								changes[x2][y2] = true;
 								change = true;
 							}

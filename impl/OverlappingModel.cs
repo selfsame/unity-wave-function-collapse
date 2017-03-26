@@ -19,10 +19,9 @@ class OverlappingModel : Model
 	public List<byte> colors;
 
 	public OverlappingModel(byte[,] sample, int N, int width, int height, bool periodicInput, bool periodicOutput, int symmetry, int foundation)
-	{
+        :base(width, height)
+    {
 		this.N = N;
-		FMX = width;
-		FMY = height;
 		periodic = periodicOutput;
 
 		int SMX = sample.GetLength(0), SMY = sample.GetLength(1);
@@ -131,21 +130,9 @@ class OverlappingModel : Model
 			counter++;
 		}
 
-		wave = new bool[FMX][][];
-		changes = new bool[FMX][];
-		for (int x = 0; x < FMX; x++)
-		{
-			wave[x] = new bool[FMY][];
-			changes[x] = new bool[FMY];
-			for (int y = 0; y < FMY; y++)
-			{
-				wave[x][y] = new bool[T];
-				changes[x][y] = false;
-				for (int t = 0; t < T; t++) wave[x][y][t] = true;
-			}
-		}
+        for (int x = 0; x < FMX; x++) for (int y = 0; y < FMY; y++) wave[x][y] = new bool[T];
 
-		Func<byte[], byte[], int, int, bool> agrees = (p1, p2, dx, dy) =>
+        Func<byte[], byte[], int, int, bool> agrees = (p1, p2, dx, dy) =>
 		{
 			int xmin = dx < 0 ? 0 : dx, xmax = dx < 0 ? dx + N : N, ymin = dy < 0 ? 0 : dy, ymax = dy < 0 ? dy + N : N;
 			for (int y = ymin; y < ymax; y++) for (int x = xmin; x < xmax; x++) if (p1[x + N * y] != p2[x - dx + N * (y - dy)]) return false;
