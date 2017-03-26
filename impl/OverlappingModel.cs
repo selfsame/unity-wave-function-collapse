@@ -44,7 +44,7 @@ class OverlappingModel : Model
 			}
 
 		int C = colors.Count;
-		int W = Stuff.Power(C, N * N);
+		long W = Stuff.Power(C, N * N);
 
 		Func<Func<int, int, byte>, byte[]> pattern = (f) =>
 		{
@@ -61,9 +61,9 @@ class OverlappingModel : Model
 		Func<byte[], byte[]> rotate  = (p) => {return pattern((x, y) => {return p[N - 1 - y + x * N];});};
 		Func<byte[], byte[]> reflect = (p) => {return pattern((x, y) => {return p[N - 1 - x + y * N];});};
 
-		Func<byte[], int> index = p =>
+		Func<byte[], long> index = p =>
 		{
-			int result = 0, power = 1;
+			long result = 0, power = 1;
 			for (int i = 0; i < p.Length; i++)
 			{
 				result += p[p.Length - 1 - i] * power;
@@ -72,9 +72,9 @@ class OverlappingModel : Model
 			return result;
 		};
 
-		Func<int, byte[]> patternFromIndex = ind =>
+		Func<long, byte[]> patternFromIndex = ind =>
 		{
-			int residue = ind, power = W;
+			long residue = ind, power = W;
 			byte[] result = new byte[N * N];
 
 			for (int i = 0; i < result.Length; i++)
@@ -94,7 +94,7 @@ class OverlappingModel : Model
 			return result;
 		};
 
-		Dictionary<int, int> weights = new Dictionary<int, int>();
+		Dictionary<long, int> weights = new Dictionary<long, int>();
 		for (int y = 0; y < (periodicInput ? SMY : SMY - N + 1); y++) for (int x = 0; x < (periodicInput ? SMX : SMX - N + 1); x++)
 			{
 				byte[][] ps = new byte[8][];
@@ -110,7 +110,7 @@ class OverlappingModel : Model
 
 				for (int k = 0; k < symmetry; k++)
 				{
-					int ind = index(ps[k]);
+					long ind = index(ps[k]);
 					if (weights.ContainsKey(ind)) weights[ind]++;
 					else weights.Add(ind, 1);
 				}
