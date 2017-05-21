@@ -37,8 +37,8 @@ class Training : MonoBehaviour{
 					if (!neighbors.ContainsKey(key) && tiles[idx] && tiles[ridx]){
 						neighbors.Add(key, new int[] {idx, rot, ridx, rrot});
 						Debug.DrawLine(
-							transform.TransformPoint(new Vector3((x+0f)*gridsize, 1f, (y+0f)*gridsize)), 
-							transform.TransformPoint(new Vector3((x+1f-r)*gridsize, 1f, (y+0f+r)*gridsize)), Color.red, 9.0f, false);
+							transform.TransformPoint(new Vector3((x+0f)*gridsize, (y+0f)*gridsize, 1f)), 
+							transform.TransformPoint(new Vector3((x+1f-r)*gridsize, (y+0f+r)*gridsize, 1f)), Color.red, 9.0f, false);
 					}
 				}
 			}
@@ -64,7 +64,7 @@ class Training : MonoBehaviour{
 				string assetpath = AssetPath(o);
 				string sym = "X";
 				string last = assetpath.Substring(assetpath.Length - 1);
-				if (last == "X" || last == "I" || last == "L" || last == "T" || last == "/"){
+				if (last == "X" || last == "I" || last == "L" || last == "T" || last == "D"){
 					sym = last;
 				}
 				res += "<tile name=\""+assetpath+"\" symmetry=\""+sym+"\" weight=\"1.0\"/>\n";
@@ -96,7 +96,7 @@ class Training : MonoBehaviour{
 		sample = new byte[width, depth]; 
 		int cnt = this.transform.childCount;
 		tiles = new UnityEngine.Object[500];
-		RS = new int[500];
+		RS = new int[1000];
 		tiles[0] = null;
 		RS[0] = 0;
 		for (int i = 0; i < cnt; i++){
@@ -124,7 +124,7 @@ class Training : MonoBehaviour{
 				#endif
 				int X = (int)(tilepos.x) / gridsize;
 				int Y = (int)(tilepos.y) / gridsize;
-				int R = (int)(tile.transform.localEulerAngles.z)/ 90;
+				int R = (int)(tile.transform.localEulerAngles.z)/90;
 				if (R == 4) {R = 0;};
 				if (!str_tile.ContainsKey(fab.name+R)){
 					int index = str_tile.Count+1;

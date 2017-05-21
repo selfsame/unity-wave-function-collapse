@@ -55,7 +55,7 @@ public class SimpleTiledWFC : MonoBehaviour{
 	public void OnDrawGizmos(){
 		Gizmos.matrix = transform.localToWorldMatrix;
 		Gizmos.color = Color.magenta;
-		Gizmos.DrawWireCube(new Vector3(width*gridsize/2f-gridsize*0.5f, 0, depth*gridsize/2f-gridsize*0.5f),new Vector3(width*gridsize, gridsize, depth*gridsize));
+		Gizmos.DrawWireCube(new Vector3(width*gridsize/2f-gridsize*0.5f, depth*gridsize/2f-gridsize*0.5f, 0f),new Vector3(width*gridsize, depth*gridsize, gridsize));
 		if (incremental) {
 			if (model != null){
 				model.Run(1, 5);
@@ -109,12 +109,12 @@ public class SimpleTiledWFC : MonoBehaviour{
 						}
 						if (fab == null){
 							continue;}
-						Vector3 pos = new Vector3(x*gridsize, 0, y*gridsize);
+						Vector3 pos = new Vector3(x*gridsize, y*gridsize, 0f);
 						GameObject tile = (GameObject)Instantiate(fab, new Vector3() , Quaternion.identity);
 						Vector3 fscale = tile.transform.localScale;
 						tile.transform.parent = group;
 						tile.transform.localPosition = pos;
-						tile.transform.localEulerAngles = new Vector3(0, rot*90, 0);
+						tile.transform.localEulerAngles = new Vector3(0, 0, rot*90);
 						tile.transform.localScale = fscale;
 						rendering[x,y] = tile;
 					}
