@@ -147,8 +147,8 @@ public class SimpleTiledModel : Model
 
 			if (subset != null && (!subset.Contains(left[0]) || !subset.Contains(right[0]))) continue;
 
-			int L = action[firstOccurrence[left[0]]][left.Length == 1 ? 0 : int.Parse(left[1])], D = action[L][1];
-			int R = action[firstOccurrence[right[0]]][right.Length == 1 ? 0 : int.Parse(right[1])], U = action[R][1];
+            int L = action[firstOccurrence[string.Join(" ", left.Take(left.Length - 1).ToArray())]][left.Length == 1 ? 0 : int.Parse(left.Last())], D = action[L][1];
+			int R = action[firstOccurrence[string.Join(" ", right.Take(right.Length - 1).ToArray())]][right.Length == 1 ? 0 : int.Parse(right.Last())], U = action[R][1];
 
             tempPropagator[0][R][L] = true;
             tempPropagator[0][action[R][6]][action[L][6]] = true;
