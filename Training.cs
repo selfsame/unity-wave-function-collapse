@@ -26,20 +26,26 @@ class Training : MonoBehaviour{
 
 	public void RecordNeighbors() {
 		neighbors = new Dictionary<string, int[]>();
-		for (int y = 0; y < depth-1; y++){
-			for (int x = 0; x < width-1; x++){
+		for (int y = 0; y < depth; y++){
+			for (int x = 0; x < width; x++){
 				for (int r = 0; r < 2; r++){
 					int idx = (int)sample[x, y];
 					int rot = Card(RS[idx] + r);
-					int ridx = (int)sample[x+1-r, y+r];
-					int rrot = Card(RS[ridx] + r);
-					string key = ""+idx+"."+rot+"|"+ridx+"."+rrot;
-					if (!neighbors.ContainsKey(key) && tiles[idx] && tiles[ridx]){
-						neighbors.Add(key, new int[] {idx, rot, ridx, rrot});
-						Debug.DrawLine(
-							transform.TransformPoint(new Vector3((x+0f)*gridsize, (y+0f)*gridsize, 1f)), 
-							transform.TransformPoint(new Vector3((x+1f-r)*gridsize, (y+0f+r)*gridsize, 1f)), Color.red, 9.0f, false);
-					}
+                    int rx = x + 1 - r;
+                    int ry = y + r;
+                    if (rx < width && ry < depth)
+                    {
+                        int ridx = (int)sample[rx, ry];
+                        int rrot = Card(RS[ridx] + r);
+                        string key = "" + idx + "." + rot + "|" + ridx + "." + rrot;
+                        if (!neighbors.ContainsKey(key) && tiles[idx] && tiles[ridx])
+                        {
+                            neighbors.Add(key, new int[] { idx, rot, ridx, rrot });
+                            Debug.DrawLine(
+                                transform.TransformPoint(new Vector3((x + 0f) * gridsize, (y + 0f) * gridsize, 1f)),
+                                transform.TransformPoint(new Vector3((x + 1f - r) * gridsize, (y + 0f + r) * gridsize, 1f)), Color.red, 9.0f, false);
+                        }
+                    }
 				}
 			}
 		}
