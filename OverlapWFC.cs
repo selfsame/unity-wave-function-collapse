@@ -12,7 +12,7 @@ class OverlapWFC : MonoBehaviour{
 	public int width = 20;
 	public int depth = 20;
 	public int seed = 0;
-	[HideInInspector]
+	//[HideInInspector]
 	public int N = 2;
 	public bool periodicInput = false;
 	public bool periodicOutput = false;
@@ -24,6 +24,7 @@ class OverlapWFC : MonoBehaviour{
 	public GameObject[,] rendering;
 	public GameObject output;
 	private Transform group;
+    private bool undrawn = true;
 
 	public static bool IsPrefabRef(UnityEngine.Object o){
 		#if UNITY_EDITOR
@@ -69,7 +70,7 @@ class OverlapWFC : MonoBehaviour{
 	public void Generate() {
 		if (training == null){Debug.Log("Can't Generate: no designated Training component");}
 		if (IsPrefabRef(training.gameObject)){
-			GameObject o = CreatePrefab(training.gameObject, new Vector3(0,0,99999f), Quaternion.identity);
+			GameObject o = CreatePrefab(training.gameObject, new Vector3(0,99999f,0f), Quaternion.identity);
 			training = o.GetComponent<Training>();
 		}
 		if (training.sample == null){
@@ -91,39 +92,42 @@ class OverlapWFC : MonoBehaviour{
 		group.parent = output.transform;
 		group.position = output.transform.position;
 		group.rotation = output.transform.rotation;
-		rendering = new GameObject[width, depth];
+        group.localScale = new Vector3(1f, 1f, 1f);
+        rendering = new GameObject[width, depth];
 		model = new OverlappingModel(training.sample, N, width, depth, periodicInput, periodicOutput, symmetry, foundation);
-	}
+        undrawn = true;
+    }
 
 	void OnDrawGizmos(){
 		Gizmos.color = Color.cyan;
 		Gizmos.matrix = transform.localToWorldMatrix;
-		Gizmos.DrawWireCube(new Vector3(width*gridsize/2f-gridsize*0.5f, 0, depth*gridsize/2f-gridsize*0.5f),new Vector3(width*gridsize, gridsize, depth*gridsize));
-		if (incremental) {
-			if (model != null){
-				model.Run(1, 5);
-				Draw();
-			}
-		}
+		Gizmos.DrawWireCube(new Vector3(width*gridsize/2f-gridsize*0.5f, depth*gridsize/2f-gridsize*0.5f, 0f),
+							new Vector3(width*gridsize, depth*gridsize, gridsize));
 	}
 
 	public void Run(){
 		if (model == null){return;}
-		if (model.Run(seed, iterations)){
+        if (undrawn == false) { return; }
+        if (model.Run(seed, iterations)){
 			Draw();
 		}
+	}
+
+	public GameObject GetTile(int x, int y){
+		return rendering[x,y];
 	}
 
 	public void Draw(){
 		if (output == null){return;}
 		if (group == null){return;}
+        undrawn = false;
 		try{
 			for (int y = 0; y < depth; y++){
 				for (int x = 0; x < width; x++){
 					if (rendering[x,y] == null){
 						int v = (int)model.Sample(x, y);
 						if (v != 99 && v < training.tiles.Length){
-							Vector3 pos = new Vector3(x*gridsize, 0, y*gridsize);
+							Vector3 pos = new Vector3(x*gridsize, y*gridsize, 0f);
 							int rot = (int)training.RS[v];
 							GameObject fab = training.tiles[v] as GameObject;
 							if (fab != null){
@@ -131,11 +135,14 @@ class OverlapWFC : MonoBehaviour{
 								Vector3 fscale = tile.transform.localScale;
 								tile.transform.parent = group;
 								tile.transform.localPosition = pos;
-								tile.transform.localEulerAngles = new Vector3(0, rot*90, 0);
+								tile.transform.localEulerAngles = new Vector3(0, 0, 360 - (rot * 90));
 								tile.transform.localScale = fscale;
 								rendering[x,y] = tile;
 							}
-						}
+						} else
+                        {
+                            undrawn = true;
+                        }
 					}
 				}
 	  		}

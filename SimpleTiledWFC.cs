@@ -26,6 +26,7 @@ public class SimpleTiledWFC : MonoBehaviour{
 	public GameObject output;
 	private Transform group;
 	public Dictionary<string, GameObject> obmap = new Dictionary<string, GameObject>();
+    private bool undrawn = true;
 
 	public void destroyChildren (){
 		foreach (Transform child in this.transform) {
@@ -47,7 +48,8 @@ public class SimpleTiledWFC : MonoBehaviour{
 
 	public void Run(){
 		if (model == null){return;}
-		if (model.Run(seed, iterations)){
+        if (undrawn == false) { return; }
+        if (model.Run(seed, iterations)){
 			Draw();
 		}
 	}
@@ -55,13 +57,7 @@ public class SimpleTiledWFC : MonoBehaviour{
 	public void OnDrawGizmos(){
 		Gizmos.matrix = transform.localToWorldMatrix;
 		Gizmos.color = Color.magenta;
-		Gizmos.DrawWireCube(new Vector3(width*gridsize/2f-gridsize*0.5f, 0, depth*gridsize/2f-gridsize*0.5f),new Vector3(width*gridsize, gridsize, depth*gridsize));
-		if (incremental) {
-			if (model != null){
-				model.Run(1, 5);
-				Draw();
-			} 
-		}
+		Gizmos.DrawWireCube(new Vector3(width*gridsize/2f-gridsize*0.5f, depth*gridsize/2f-gridsize*0.5f, 0f),new Vector3(width*gridsize, depth*gridsize, gridsize));
 	}
 
 	public void Generate(){
@@ -83,15 +79,17 @@ public class SimpleTiledWFC : MonoBehaviour{
 		group = new GameObject(xmlpath).transform;
 		group.parent = output.transform;
 		group.position = output.transform.position;
-		group.rotation = output.transform.rotation;	
-
-		rendering = new GameObject[width, depth];
+		group.rotation = output.transform.rotation;
+        group.localScale = new Vector3(1f, 1f, 1f);
+        rendering = new GameObject[width, depth];
 		this.model = new SimpleTiledModel(Application.dataPath+"/"+xmlpath, subset, width, depth, periodic);
-	}
+        undrawn = true;
+    }
 
 	public void Draw(){
 		if (output == null){return;}
 		if (group == null){return;}
+        undrawn = false;
 		for (int y = 0; y < depth; y++){
 			for (int x = 0; x < width; x++){ 
 				if (rendering[x,y] == null){
@@ -109,15 +107,18 @@ public class SimpleTiledWFC : MonoBehaviour{
 						}
 						if (fab == null){
 							continue;}
-						Vector3 pos = new Vector3(x*gridsize, 0, y*gridsize);
+						Vector3 pos = new Vector3(x*gridsize, y*gridsize, 0f);
 						GameObject tile = (GameObject)Instantiate(fab, new Vector3() , Quaternion.identity);
 						Vector3 fscale = tile.transform.localScale;
 						tile.transform.parent = group;
 						tile.transform.localPosition = pos;
-						tile.transform.localEulerAngles = new Vector3(0, rot*90, 0);
+						tile.transform.localEulerAngles = new Vector3(0, 0, 360-(rot*90));
 						tile.transform.localScale = fscale;
 						rendering[x,y] = tile;
-					}
+					} else
+                    {
+                        undrawn = true;
+                    }
 				}
 			}
   		}	

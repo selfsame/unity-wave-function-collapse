@@ -26,20 +26,26 @@ class Training : MonoBehaviour{
 
 	public void RecordNeighbors() {
 		neighbors = new Dictionary<string, int[]>();
-		for (int y = 0; y < depth-1; y++){
-			for (int x = 0; x < width-1; x++){
+		for (int y = 0; y < depth; y++){
+			for (int x = 0; x < width; x++){
 				for (int r = 0; r < 2; r++){
 					int idx = (int)sample[x, y];
 					int rot = Card(RS[idx] + r);
-					int ridx = (int)sample[x+1-r, y+r];
-					int rrot = Card(RS[ridx] + r);
-					string key = ""+idx+"."+rot+"|"+ridx+"."+rrot;
-					if (!neighbors.ContainsKey(key) && tiles[idx] && tiles[ridx]){
-						neighbors.Add(key, new int[] {idx, rot, ridx, rrot});
-						Debug.DrawLine(
-							transform.TransformPoint(new Vector3((x+0f)*gridsize, 1f, (y+0f)*gridsize)), 
-							transform.TransformPoint(new Vector3((x+1f-r)*gridsize, 1f, (y+0f+r)*gridsize)), Color.red, 9.0f, false);
-					}
+                    int rx = x + 1 - r;
+                    int ry = y + r;
+                    if (rx < width && ry < depth)
+                    {
+                        int ridx = (int)sample[rx, ry];
+                        int rrot = Card(RS[ridx] + r);
+                        string key = "" + idx + "." + rot + "|" + ridx + "." + rrot;
+                        if (!neighbors.ContainsKey(key) && tiles[idx] && tiles[ridx])
+                        {
+                            neighbors.Add(key, new int[] { idx, rot, ridx, rrot });
+                            Debug.DrawLine(
+                                transform.TransformPoint(new Vector3((x + 0f) * gridsize, (y + 0f) * gridsize, 1f)),
+                                transform.TransformPoint(new Vector3((x + 1f - r) * gridsize, (y + 0f + r) * gridsize, 1f)), Color.red, 9.0f, false);
+                        }
+                    }
 				}
 			}
 		}
@@ -64,7 +70,7 @@ class Training : MonoBehaviour{
 				string assetpath = AssetPath(o);
 				string sym = "X";
 				string last = assetpath.Substring(assetpath.Length - 1);
-				if (last == "X" || last == "I" || last == "L" || last == "T" || last == "/"){
+				if (last == "X" || last == "I" || last == "L" || last == "T" || last == "D"){
 					sym = last;
 				}
 				res += "<tile name=\""+assetpath+"\" symmetry=\""+sym+"\" weight=\"1.0\"/>\n";
@@ -96,7 +102,7 @@ class Training : MonoBehaviour{
 		sample = new byte[width, depth]; 
 		int cnt = this.transform.childCount;
 		tiles = new UnityEngine.Object[500];
-		RS = new int[500];
+		RS = new int[1000];
 		tiles[0] = null;
 		RS[0] = 0;
 		for (int i = 0; i < cnt; i++){
@@ -104,7 +110,7 @@ class Training : MonoBehaviour{
 			Vector3 tilepos = tile.transform.localPosition;
 			
 			if ((tilepos.x > -0.55f) && (tilepos.x <= width*gridsize-0.55f) &&
-				  (tilepos.z > -0.55f) && (tilepos.z <= depth*gridsize-0.55f)){
+				  (tilepos.y > -0.55f) && (tilepos.y <= depth*gridsize-0.55f)){
 				UnityEngine.Object fab = tile;
 				#if UNITY_EDITOR
 				fab = PrefabUtility.GetPrefabParent(tile);
@@ -123,8 +129,8 @@ class Training : MonoBehaviour{
 				tile.name = fab.name;
 				#endif
 				int X = (int)(tilepos.x) / gridsize;
-				int Y = (int)(tilepos.z) / gridsize;
-				int R = (int)(tile.transform.localEulerAngles.y)/ 90;
+				int Y = (int)(tilepos.y) / gridsize;
+				int R = (int)((360 - tile.transform.localEulerAngles.z)/90);
 				if (R == 4) {R = 0;};
 				if (!str_tile.ContainsKey(fab.name+R)){
 					int index = str_tile.Count+1;
@@ -144,14 +150,14 @@ class Training : MonoBehaviour{
 	void OnDrawGizmos(){
 		Gizmos.matrix = transform.localToWorldMatrix;
 		Gizmos.color = Color.magenta;
-		Gizmos.DrawWireCube(new Vector3((width*gridsize/2f)-gridsize*0.5f, 0, (depth*gridsize/2f)-gridsize*0.5f),
-							new Vector3(width*gridsize, gridsize, depth*gridsize));
+		Gizmos.DrawWireCube(new Vector3((width*gridsize/2f)-gridsize*0.5f, (depth*gridsize/2f)-gridsize*0.5f, 0f),
+							new Vector3(width*gridsize, depth*gridsize, gridsize));
 		Gizmos.color = Color.cyan;
 		for (int i = 0; i < this.transform.childCount; i++){
 			GameObject tile = this.transform.GetChild(i).gameObject;
 			Vector3 tilepos = tile.transform.localPosition;
 			if ((tilepos.x > -0.55f) && (tilepos.x <= width*gridsize-0.55f) &&
-				(tilepos.z > -0.55f) && (tilepos.z <= depth*gridsize-0.55f)){
+				(tilepos.y > -0.55f) && (tilepos.y <= depth*gridsize-0.55f)){
 				Gizmos.DrawSphere(tilepos, gridsize*0.2f);
 			}
 		}

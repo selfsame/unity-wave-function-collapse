@@ -63,11 +63,11 @@ public class TilePainter : MonoBehaviour{
 		GameObject pal = new GameObject("palette");
 		pal.hideFlags = HideFlags.HideInHierarchy;
 		BoxCollider bc = pal.AddComponent<BoxCollider>();
-		bc.size = new Vector3(palette.Count*gridsize, 0f, gridsize);
+		bc.size = new Vector3(palette.Count*gridsize, gridsize, 0f);
 		bc.center = new Vector3((palette.Count-1f)*gridsize*0.5f, 0f, 0f);
 
 		pal.transform.parent = this.gameObject.transform;
-		pal.transform.localPosition = new Vector3(0f,0f, -gridsize*2);
+		pal.transform.localPosition = new Vector3(0f, -gridsize*2, 0f);
 		pal.transform.rotation = transform.rotation;
 
 
@@ -111,7 +111,7 @@ public class TilePainter : MonoBehaviour{
 			GameObject tile = tiles.transform.GetChild(i).gameObject;
 			Vector3 tilepos = tile.transform.localPosition;
 			int X = (int)(tilepos.x / gridsize);
-			int Y = (int)(tilepos.z / gridsize);
+			int Y = (int)(tilepos.y / gridsize);
 			if (ValidCoords(X, Y)){
 			tileobs[X, Y] = tile; 
 			} else {
@@ -147,13 +147,13 @@ public class TilePainter : MonoBehaviour{
 	void OnValidate(){
 		_changed = true;
 		BoxCollider bounds = this.GetComponent<BoxCollider>();
-		bounds.center = new Vector3((width*gridsize)*0.5f-gridsize*0.5f, 0f, (height*gridsize)*0.5f-gridsize*0.5f);
-		bounds.size = new Vector3(width*gridsize, 0f, (height*gridsize));
+		bounds.center = new Vector3((width*gridsize)*0.5f-gridsize*0.5f, (height*gridsize)*0.5f-gridsize*0.5f, 0f);
+		bounds.size = new Vector3(width*gridsize, (height*gridsize), 0f);
 	}
 
 	public Vector3 GridV3(Vector3 pos){
-		Vector3 p = transform.InverseTransformPoint(pos) + new Vector3(gridsize*0.5f,0f,gridsize*0.5f);
-		return new Vector3((int)(p.x/gridsize), 0, (int)(p.z/gridsize));
+		Vector3 p = transform.InverseTransformPoint(pos) + new Vector3(gridsize*0.5f,gridsize*0.5f, 0f);
+		return new Vector3((int)(p.x/gridsize), (int)(p.y/gridsize), 0);
 	}
 
 	public bool ValidCoords(int x, int y){
@@ -172,10 +172,10 @@ public class TilePainter : MonoBehaviour{
 	}
 
 	public void Turn(){
-		if (this.ValidCoords((int)cursor.x, (int)cursor.z)){
-			GameObject o = tileobs[(int)cursor.x, (int)cursor.z];
+		if (this.ValidCoords((int)cursor.x, (int)cursor.y)){
+			GameObject o = tileobs[(int)cursor.x, (int)cursor.y];
 			if (o != null){
-				o.transform.Rotate(0f, 90f, 0f);
+				o.transform.Rotate(0f, 0f, 90f);
 			}
 		}
 	}
@@ -187,27 +187,27 @@ public class TilePainter : MonoBehaviour{
 	public void Drag(Vector3 mouse, TileLayerEditor.TileOperation op){
 		Resize();
 		if (tileobs == null){Restore();}
-		if (this.ValidCoords((int)cursor.x, (int)cursor.z)){
+		if (this.ValidCoords((int)cursor.x, (int)cursor.y)){
 			if (op == TileLayerEditor.TileOperation.Sampling){
-				UnityEngine.Object s = PrefabUtility.GetPrefabParent(tileobs[(int)cursor.x, (int)cursor.z]);
+				UnityEngine.Object s = PrefabUtility.GetPrefabParent(tileobs[(int)cursor.x, (int)cursor.y]);
 				if (s != null){
 					color = s;
-					color_rotation = tileobs[(int)cursor.x, (int)cursor.z].transform.localRotation;
+					color_rotation = tileobs[(int)cursor.x, (int)cursor.y].transform.localRotation;
 				}
 			} else {
-				DestroyImmediate(tileobs[(int)cursor.x, (int)cursor.z]); 
+				DestroyImmediate(tileobs[(int)cursor.x, (int)cursor.y]); 
 				if (op == TileLayerEditor.TileOperation.Drawing){
 					if (color == null){return;}
 					GameObject o = CreatePrefab(color, new Vector3() , color_rotation);
 					o.transform.parent = tiles.transform;
 					o.transform.localPosition = (cursor*gridsize);
 					o.transform.localRotation = color_rotation;
-					tileobs[(int)cursor.x, (int)cursor.z] = o;
+					tileobs[(int)cursor.x, (int)cursor.y] = o;
 				}
 			}
 		} else {
 			if (op == TileLayerEditor.TileOperation.Sampling){
-				if (cursor.z == -1 && cursor.x >= 0 && cursor.x < palette.Count){
+				if (cursor.y == -1 && cursor.x >= 0 && cursor.x < palette.Count){
 					color = palette[(int)cursor.x];
 					color_rotation = Quaternion.identity;
 				}
@@ -234,8 +234,8 @@ public class TilePainter : MonoBehaviour{
 			Gizmos.color = Color.yellow;
 		}
 
-		Gizmos.DrawWireCube( new Vector3((width*gridsize)*0.5f-gridsize*0.5f, 0f, (height*gridsize)*0.5f-gridsize*0.5f),
-			new Vector3(width*gridsize, 0f, (height*gridsize)));
+		Gizmos.DrawWireCube( new Vector3((width*gridsize)*0.5f-gridsize*0.5f, (height*gridsize)*0.5f-gridsize*0.5f, 0f),
+			new Vector3(width*gridsize, (height*gridsize), 0f));
 	}
 	#endif
 }
