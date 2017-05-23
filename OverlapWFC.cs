@@ -24,6 +24,7 @@ class OverlapWFC : MonoBehaviour{
 	public GameObject[,] rendering;
 	public GameObject output;
 	private Transform group;
+    private bool undrawn = true;
 
 	public static bool IsPrefabRef(UnityEngine.Object o){
 		#if UNITY_EDITOR
@@ -91,26 +92,23 @@ class OverlapWFC : MonoBehaviour{
 		group.parent = output.transform;
 		group.position = output.transform.position;
 		group.rotation = output.transform.rotation;
-		rendering = new GameObject[width, depth];
+        group.localScale = new Vector3(1f, 1f, 1f);
+        rendering = new GameObject[width, depth];
 		model = new OverlappingModel(training.sample, N, width, depth, periodicInput, periodicOutput, symmetry, foundation);
-	}
+        undrawn = true;
+    }
 
 	void OnDrawGizmos(){
 		Gizmos.color = Color.cyan;
 		Gizmos.matrix = transform.localToWorldMatrix;
 		Gizmos.DrawWireCube(new Vector3(width*gridsize/2f-gridsize*0.5f, depth*gridsize/2f-gridsize*0.5f, 0f),
 							new Vector3(width*gridsize, depth*gridsize, gridsize));
-		if (incremental) {
-			if (model != null){
-				model.Run(1, 5);
-				Draw();
-			}
-		}
 	}
 
 	public void Run(){
 		if (model == null){return;}
-		if (model.Run(seed, iterations)){
+        if (undrawn == false) { return; }
+        if (model.Run(seed, iterations)){
 			Draw();
 		}
 	}
@@ -122,6 +120,7 @@ class OverlapWFC : MonoBehaviour{
 	public void Draw(){
 		if (output == null){return;}
 		if (group == null){return;}
+        undrawn = false;
 		try{
 			for (int y = 0; y < depth; y++){
 				for (int x = 0; x < width; x++){
@@ -136,11 +135,14 @@ class OverlapWFC : MonoBehaviour{
 								Vector3 fscale = tile.transform.localScale;
 								tile.transform.parent = group;
 								tile.transform.localPosition = pos;
-								tile.transform.localEulerAngles = new Vector3(0, 0, rot*90);
+								tile.transform.localEulerAngles = new Vector3(0, 0, 360 - (rot * 90));
 								tile.transform.localScale = fscale;
 								rendering[x,y] = tile;
 							}
-						}
+						} else
+                        {
+                            undrawn = true;
+                        }
 					}
 				}
 	  		}

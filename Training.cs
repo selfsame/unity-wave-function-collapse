@@ -124,7 +124,7 @@ class Training : MonoBehaviour{
 				#endif
 				int X = (int)(tilepos.x) / gridsize;
 				int Y = (int)(tilepos.y) / gridsize;
-				int R = (int)(tile.transform.localEulerAngles.z)/90;
+				int R = (int)((360 - tile.transform.localEulerAngles.z)/90);
 				if (R == 4) {R = 0;};
 				if (!str_tile.ContainsKey(fab.name+R)){
 					int index = str_tile.Count+1;
