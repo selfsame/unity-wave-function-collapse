@@ -222,17 +222,35 @@ class OverlappingModel : Model
 		{
 			for (int x = 0; x < FMX; x++)
 			{
-				for (int t = 0; t < T; t++) if (t != foundation) wave[x][0][t] = false;
-				changes[x][0] = true;
-
-				for (int y = 2; y < FMY; y++)
+				for (int y = 0; y < FMY; y++)
 				{
-					wave[x][y][foundation] = false;
-					changes[x][y] = true;
+					if (x == 0 || x == FMX-2 || y == 0 || y == FMX-2) {
+						for (int t = 0; t < T; t++) if (t != foundation) wave[x][y][t] = false;
+						changes[x][y] = true;
+					}
+					if (x > 1 && x < FMX-2 && y > 1 && y < FMY-2) {
+						wave[x][y][foundation] = false;
+						changes[x][y] = true;
+					}
 				}
-
 				while (Propagate());
 			}
+			// for (int x = 0; x < FMX; x++)
+			// {
+			// 	for (int t = 0; t < T; t++) if (t != foundation) wave[x][0][t] = false;
+			// 	changes[x][0] = true;
+
+			// 	for (int t = 0; t < T; t++) if (t != foundation) wave[x][FMY-2][t] = false;
+			// 	changes[x][FMY-2] = true;
+
+			// 	for (int y = 2; y < FMY-2; y++)
+			// 	{
+			// 		wave[x][y][foundation] = false;
+			// 		changes[x][y] = true;
+			// 	}
+
+			// 	while (Propagate());
+			// }
 		}
 	}
 }

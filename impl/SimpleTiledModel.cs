@@ -22,7 +22,7 @@ public class SimpleTiledModel : Model
 		this.periodic = periodic;
 
 		var xdoc = new XmlDocument();
-		xdoc.Load(name);
+		xdoc.LoadXml(name);
 		XmlNode xnode = xdoc.FirstChild;
 		bool unique = xnode.Get("unique", false);
 		xnode = xnode.FirstChild;

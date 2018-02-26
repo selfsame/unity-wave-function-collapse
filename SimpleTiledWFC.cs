@@ -9,7 +9,7 @@ using UnityEditor;
 [ExecuteInEditMode]
 public class SimpleTiledWFC : MonoBehaviour{
 	
-	public string xmlpath = null;
+	public TextAsset xml = null;
 	private string subset = "";
 
 	public int gridsize = 1;
@@ -76,13 +76,13 @@ public class SimpleTiledWFC : MonoBehaviour{
 			GameObject go = output.transform.GetChild(i).gameObject;
 			if (Application.isPlaying){Destroy(go);} else {DestroyImmediate(go);}
 		}
-		group = new GameObject(xmlpath).transform;
+		group = new GameObject(xml.name).transform;
 		group.parent = output.transform;
 		group.position = output.transform.position;
 		group.rotation = output.transform.rotation;
         group.localScale = new Vector3(1f, 1f, 1f);
         rendering = new GameObject[width, depth];
-		this.model = new SimpleTiledModel(Application.dataPath+"/"+xmlpath, subset, width, depth, periodic);
+		this.model = new SimpleTiledModel(xml.text, subset, width, depth, periodic);
         undrawn = true;
     }
 
@@ -130,7 +130,7 @@ public class SimpleTiledWFC : MonoBehaviour{
 public class TileSetEditor : Editor {
 	public override void OnInspectorGUI () {
 		SimpleTiledWFC me = (SimpleTiledWFC)target;
-		if (me.xmlpath != null){
+		if (me.xml != null){
 			if(GUILayout.Button("generate")){
 				me.Generate();
 			}
