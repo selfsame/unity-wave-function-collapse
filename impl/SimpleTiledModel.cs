@@ -13,7 +13,6 @@ using System.Collections.Generic;
 
 public class SimpleTiledModel : Model
 {
-	public int[][][] propagator;
 	public List<string> tiles;
 
 	public SimpleTiledModel(string name, string subsetName, int width, int height, bool periodic)
@@ -127,18 +126,16 @@ public class SimpleTiledModel : Model
 		}
 
 		T = action.Count;
-		stationary = tempStationary.ToArray();
+		weights = tempStationary.ToArray();
 
-        var tempPropagator = new bool[4][][];
         propagator = new int[4][][];
+        var tempPropagator = new bool[4][][];
 		for (int d = 0; d < 4; d++)
 		{
             tempPropagator[d] = new bool[T][];
             propagator[d] = new int[T][];
             for (int t = 0; t < T; t++) tempPropagator[d][t] = new bool[T];
         }
-
-        for (int x = 0; x < FMX; x++) for (int y = 0; y < FMY; y++) wave[x][y] = new bool[T];
 
         foreach (XmlNode xneighbor in xnode.NextSibling.ChildNodes)
 		{
@@ -187,75 +184,12 @@ public class SimpleTiledModel : Model
             }
         }
 
-	protected override bool Propagate()
-	{
-		bool change = false, b;
-		for (int x2 = 0; x2 < FMX; x2++) for (int y2 = 0; y2 < FMY; y2++) for (int d = 0; d < 4; d++)
-				{
-					int x1 = x2, y1 = y2;
-					if (d == 0)
-					{
-						if (x2 == 0)
-						{
-							if (!periodic) continue;
-							else x1 = FMX - 1;
-						}
-						else x1 = x2 - 1;
-					}
-					else if (d == 1)
-					{
-						if (y2 == FMY - 1)
-						{
-							if (!periodic) continue;
-							else y1 = 0;
-						}
-						else y1 = y2 + 1;
-					}
-					else if (d == 2)
-					{
-						if (x2 == FMX - 1)
-						{
-							if (!periodic) continue;
-							else x1 = 0;
-						}
-						else x1 = x2 + 1;
-					}
-					else
-					{
-						if (y2 == 0)
-						{
-							if (!periodic) continue;
-							else y1 = FMY - 1;
-						}
-						else y1 = y2 - 1;
-					}
 
-					if (!changes[x1][y1]) continue;
-					bool[] w1 = wave[x1][y1];
- 					bool[] w2 = wave[x2][y2];
-
-                    for (int t2 = 0; t2 < T; t2++)
-                    {
-                        if (!w2[t2]) continue;
-                        b = false;
-                        int[] prop = propagator[d][t2];
-                        for (int i1 = 0; i1 < prop.Length && !b; i1++) b = w1[prop[i1]];
-                        if (!b)
-                        {
-                            changes[x2][y2] = true;
-                            change = true;
-                            w2[t2] = false;
-                        }
-                    }
-				}			
-
-		return change;
-	}
 
 	public string Sample(int x, int y){
 		bool found = false;
 		string res = "?";
-		for (int t = 0; t < T; t++) if (wave[x][y][t]){
+		for (int t = 0; t < T; t++) if (wave[x + y * FMX][t]){
 			if (found) {return "?";}
 			found = true;
 			res = tiles[t];
@@ -264,7 +198,7 @@ public class SimpleTiledModel : Model
 	}
 
 	protected override bool OnBoundary(int x, int y){
-		return false;
+		return !periodic && (x < 0 || y < 0 || x >= FMX || y >= FMY);
 	}
 
 }

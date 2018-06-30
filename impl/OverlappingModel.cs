@@ -11,14 +11,14 @@ using System.Collections.Generic;
 
 class OverlappingModel : Model
 {
-	int[][][][] propagator;
+
 	int N;
 
 	public byte[][] patterns;
-	int foundation;
+	int ground;
 	public List<byte> colors;
 
-	public OverlappingModel(byte[,] sample, int N, int width, int height, bool periodicInput, bool periodicOutput, int symmetry, int foundation)
+	public OverlappingModel(byte[,] sample, int N, int width, int height, bool periodicInput, bool periodicOutput, int symmetry, int ground)
         :base(width, height)
     {
 		this.N = N;
@@ -48,11 +48,7 @@ class OverlappingModel : Model
 		Func<Func<int, int, byte>, byte[]> pattern = (f) =>
 		{
 			byte[] result = new byte[N * N];
-			for (int y = 0; y < N; y++){
-				for (int x = 0; x < N; x++){
-					result[x + y * N] = f(x, y);
-				}
-			}
+			for (int y = 0; y < N; y++) for (int x = 0; x < N; x++) result[x + y * N] = f(x, y);
 			return result;
 		};
 
@@ -116,21 +112,20 @@ class OverlappingModel : Model
 			}
 
 		T = weights.Count;
-		this.foundation = (foundation + T) % T;
+		this.ground = (ground + T) % T;
 
 		patterns = new byte[T][];
-		stationary = new double[T];
-		propagator = new int[2 * N - 1][][][];
+		base.weights = new double[T];
 
 		int counter = 0;
 		foreach (int w in weights.Keys)
 		{
 			patterns[counter] = patternFromIndex(w);
-			stationary[counter] = weights[w];
+			base.weights[counter] = weights[w];
 			counter++;
 		}
 
-        for (int x = 0; x < FMX; x++) for (int y = 0; y < FMY; y++) wave[x][y] = new bool[T];
+        
 
         Func<byte[], byte[], int, int, bool> agrees = (p1, p2, dx, dy) =>
 		{
@@ -139,74 +134,31 @@ class OverlappingModel : Model
 			return true;
 		};
 
-		for (int x = 0; x < 2 * N - 1; x++)
+		propagator = new int[4][][];
+		for (int d = 0; d < 4; d++)
 		{
-			propagator[x] = new int[2 * N - 1][][];
-			for (int y = 0; y < 2 * N - 1; y++)
+			propagator[d] = new int[T][];
+			for (int t = 0; t < T; t++)
 			{
-				propagator[x][y] = new int[T][];
-				for (int t = 0; t < T; t++)
-				{
-					List<int> list = new List<int>();
-					for (int t2 = 0; t2 < T; t2++) if (agrees(patterns[t], patterns[t2], x - N + 1, y - N + 1)) list.Add(t2);
-					propagator[x][y][t] = new int[list.Count];
-					for (int c = 0; c < list.Count; c++) propagator[x][y][t][c] = list[c];
-				}
+				List<int> list = new List<int>();
+				for (int t2 = 0; t2 < T; t2++) if (agrees(patterns[t], patterns[t2], DX[d], DY[d])) list.Add(t2);
+				propagator[d][t] = new int[list.Count];
+				for (int c = 0; c < list.Count; c++) propagator[d][t][c] = list[c];
 			}
 		}
 	}
 
-	protected override bool OnBoundary(int x, int y){
-		return !periodic && (x + N > FMX || y + N > FMY);}
-
-	override protected bool Propagate()
+	protected override bool OnBoundary(int x, int y)
 	{
-		bool change = false, b;
-		int x2, y2;
-
-		for (int x1 = 0; x1 < FMX; x1++) for (int y1 = 0; y1 < FMY; y1++) if (changes[x1][y1])
-				{
-					changes[x1][y1] = false;
-					for (int dx = -N + 1; dx < N; dx++) for (int dy = -N + 1; dy < N; dy++)
-						{
-							x2 = x1 + dx;
-							if (x2 < 0) x2 += FMX;
-							else if (x2 >= FMX) x2 -= FMX;
-
-							y2 = y1 + dy;
-							if (y2 < 0) y2 += FMY;
- 							else if (y2 >= FMY) y2 -= FMY;
-
-							if (!periodic && (x2 + N > FMX || y2 + N > FMY)) continue;
-
-							bool[] w1 = wave[x1][y1];
-							bool[] w2 = wave[x2][y2];
-							int[][] p = propagator[N - 1 - dx][N - 1 - dy];
-
-							for (int t2 = 0; t2 < T; t2++)
-							{
-								if (!w2[t2]) continue;
-								b = false;
-								int[] prop = p[t2];
-								for (int i1 = 0; i1 < prop.Length && !b; i1++) b = w1[prop[i1]];
-
-								if (!b)
-								{
-									changes[x2][y2] = true;
-									change = true;
-									w2[t2] = false;
-								}
-							}
-						}
-				}
-
-		return change;
+		return !periodic && (x + N > FMX || y + N > FMY || x < 0 || y < 0);
 	}
+
+
 
 	public byte Sample(int x, int y){
 		bool found = false;
 		byte res = (byte)99;
-		for (int t = 0; t < T; t++) if (wave[x][y][t]){
+		for (int t = 0; t < T; t++) if (wave[x + y * FMX][t]){
 			if (found) {return (byte)99;}
 			found = true;
 			res = patterns[t][0];
@@ -214,25 +166,19 @@ class OverlappingModel : Model
 		return res;
 	}
 
-	public override void Clear()
+	protected override void Clear()
 	{
 		base.Clear();
 
-		if (foundation != 0)
+		if (ground != 0)
 		{
 			for (int x = 0; x < FMX; x++)
 			{
-				for (int t = 0; t < T; t++) if (t != foundation) wave[x][0][t] = false;
-				changes[x][0] = true;
-
-				for (int y = 2; y < FMY; y++)
-				{
-					wave[x][y][foundation] = false;
-					changes[x][y] = true;
-				}
-
-				while (Propagate());
+				for (int t = 0; t < T; t++) if (t != ground) Ban(x + (FMY - 1) * FMX, t);
+				for (int y = 0; y < FMY - 1; y++) Ban(x + y * FMX, ground);
 			}
+
+			Propagate();
 		}
 	}
 }

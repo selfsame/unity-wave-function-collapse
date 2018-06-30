@@ -25,6 +25,7 @@ class Training : MonoBehaviour{
 	}
 
 	public void RecordNeighbors() {
+		Compile();
 		neighbors = new Dictionary<string, int[]>();
 		for (int y = 0; y < depth; y++){
 			for (int x = 0; x < width; x++){
