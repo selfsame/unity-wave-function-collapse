@@ -7,6 +7,7 @@ The software is provided "as is", without warranty of any kind, express or impli
 */
 
 using System;
+using Eppy;
 
 public abstract class Model
 {
@@ -215,7 +216,6 @@ public abstract class Model
 	}
 
 	protected abstract bool OnBoundary(int x, int y);
-	public abstract System.Drawing.Bitmap Graphics();
 
 	protected static int[] DX = { -1, 0, 1, 0 };
 	protected static int[] DY = { 0, 1, 0, -1 };
