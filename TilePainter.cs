@@ -184,12 +184,30 @@ public class TilePainter : MonoBehaviour{
 		return this.transform.TransformPoint(p);
 	}
 
+	public UnityEngine.Object PrefabSource(GameObject o){
+        if (o == null)
+        {
+            return null;
+        }
+        UnityEngine.Object fab = PrefabUtility.GetCorrespondingObjectFromSource(o);
+        if (fab == null)
+        {
+            fab = Resources.Load(o.name);
+        }
+        if (fab == null)
+        {
+            fab = palette[0];
+        }
+        return fab;
+    }
+
 	public void Drag(Vector3 mouse, TileLayerEditor.TileOperation op){
 		Resize();
 		if (tileobs == null){Restore();}
 		if (this.ValidCoords((int)cursor.x, (int)cursor.y)){
 			if (op == TileLayerEditor.TileOperation.Sampling){
-				UnityEngine.Object s = PrefabUtility.GetPrefabParent(tileobs[(int)cursor.x, (int)cursor.y]);
+				UnityEngine.Object s = PrefabSource(tileobs[(int)cursor.x, (int)cursor.y]);
+                Debug.Log(s);
 				if (s != null){
 					color = s;
 					color_rotation = tileobs[(int)cursor.x, (int)cursor.y].transform.localRotation;
@@ -270,7 +288,7 @@ public class TilePainter : MonoBehaviour{
 			me.focused = true;
 
 			Renderer rend = me.gameObject.GetComponentInChildren<Renderer>( );
-			if( rend ) EditorUtility.SetSelectedWireframeHidden( rend, false );
+			if( rend ) EditorUtility.SetSelectedRenderState( rend, EditorSelectedRenderState.Wireframe );
 			return true;
 		}
 		me.focused = false;

@@ -28,9 +28,10 @@ class OverlapWFC : MonoBehaviour{
 
 	public static bool IsPrefabRef(UnityEngine.Object o){
 		#if UNITY_EDITOR
-		return PrefabUtility.GetPrefabParent(o) == null && PrefabUtility.GetPrefabObject(o) != null;
-		#endif
+		return PrefabUtility.GetOutermostPrefabInstanceRoot(o) != null;
+		#else
 		return true;
+		#endif
 	}
 
 	static GameObject CreatePrefab(UnityEngine.Object fab, Vector3 pos, Quaternion rot) {
@@ -39,11 +40,12 @@ class OverlapWFC : MonoBehaviour{
 		e.transform.position = pos;
 		e.transform.rotation = rot;
 		return e;
-		#endif
+		#else
 		GameObject o = GameObject.Instantiate(fab as GameObject) as GameObject; 
 		o.transform.position = pos;
 		o.transform.rotation = rot;
 		return o;
+		#endif
 	}
 
 	public void Clear(){
@@ -146,7 +148,7 @@ class OverlapWFC : MonoBehaviour{
 					}
 				}
 	  		}
-	  	} catch (IndexOutOfRangeException e) {
+	  	} catch (IndexOutOfRangeException) {
 	  		model = null;
 	  		return;
 	  	}
