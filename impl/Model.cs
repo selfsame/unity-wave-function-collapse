@@ -7,7 +7,6 @@ The software is provided "as is", without warranty of any kind, express or impli
 */
 
 using System;
-using Eppy;
 
 public abstract class Model
 {
@@ -19,7 +18,7 @@ public abstract class Model
 
 	protected bool init = false;
 
-	Eppy.Tuple<int, int>[] stack;
+	Tuple<int, int>[] stack;
 	int stacksize;
 
 	protected System.Random random;
@@ -68,7 +67,7 @@ public abstract class Model
 		sumsOfWeightLogWeights = new double[FMX * FMY];
 		entropies = new double[FMX * FMY];
 		
-		stack = new Eppy.Tuple<int, int>[wave.Length * T];
+		stack = new Tuple<int, int>[wave.Length * T];
 		stacksize = 0;
 	}
 
@@ -184,7 +183,7 @@ public abstract class Model
 
 		int[] comp = compatible[i][t];
 		for (int d = 0; d < 4; d++) comp[d] = 0;
-		stack[stacksize] = new Eppy.Tuple<int, int>(i, t);
+		stack[stacksize] = new Tuple<int, int>(i, t);
 		stacksize++;
 
 		double sum = sumsOfWeights[i];
