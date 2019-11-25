@@ -8,6 +8,7 @@ The software is provided "as is", without warranty of any kind, express or impli
 
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 class OverlappingModel : Model
 {
@@ -90,7 +91,9 @@ class OverlappingModel : Model
 		};
 
 		Dictionary<long, int> weights = new Dictionary<long, int>();
-		for (int y = 0; y < (periodicInput ? SMY : SMY - N + 1); y++) for (int x = 0; x < (periodicInput ? SMX : SMX - N + 1); x++)
+        List<long> ordering = new List<long>();
+
+        for (int y = 0; y < (periodicInput ? SMY : SMY - N + 1); y++) for (int x = 0; x < (periodicInput ? SMX : SMX - N + 1); x++)
 			{
 				byte[][] ps = new byte[8][];
 
@@ -107,7 +110,10 @@ class OverlappingModel : Model
 				{
 					long ind = index(ps[k]);
 					if (weights.ContainsKey(ind)) weights[ind]++;
-					else weights.Add(ind, 1);
+					else {
+                        weights.Add(ind, 1);
+                        ordering.Add(ind);
+                    }
 				}
 			}
 
@@ -118,11 +124,11 @@ class OverlappingModel : Model
 		base.weights = new double[T];
 
 		int counter = 0;
-		foreach (int w in weights.Keys)
+		foreach (long w in ordering)
 		{
 			patterns[counter] = patternFromIndex(w);
-			base.weights[counter] = weights[w];
-			counter++;
+            base.weights[counter] = weights[w];
+            counter++;
 		}
 
         
@@ -169,16 +175,29 @@ class OverlappingModel : Model
 	protected override void Clear()
 	{
 		base.Clear();
-
-		if (ground != 0)
+        //here we could actually set ground as all 4 sides possibly, think i need to query which ngram is made from the ground tile index, instead of just using that index into the ngrams
+        if (ground != 0)
 		{
 			for (int x = 0; x < FMX; x++)
 			{
-				for (int t = 0; t < T; t++) if (t != ground) Ban(x + (FMY - 1) * FMX, t);
-				for (int y = 0; y < FMY - 1; y++) Ban(x + y * FMX, ground);
-			}
+                //top
+				//for (int t = 0; t < T; t++) if (t != ground) Ban(x + (FMY - 1) * FMX, t);
+                
+                //bottom
+                for (int t = 0; t < T; t++) if (t != ground) Ban(x, t);
 
-			Propagate();
+            }
+
+        /* for (int y = 0; y < FMY; y++)
+            {
+                //right
+                for (int t = 0; t < T; t++) if (t != ground) Ban((y * FMX) + (FMX - 1), t);
+                
+                //left
+                for (int t = 0; t < T; t++) if (t != ground) Ban(y * FMX, t);
+            }*/
+
+            Propagate();
 		}
 	}
 }
