@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using UnityEngine;
+using System.Globalization;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -74,7 +75,7 @@ class Training : MonoBehaviour{
 				if (last == "X" || last == "I" || last == "L" || last == "T" || last == "D"){
 					sym = last;
 				}
-				res += "<tile name=\""+assetpath+"\" symmetry=\""+sym+"\" weight=\"1.0\"/>\n";
+				res += "<tile name=\""+assetpath+"\" symmetry=\""+sym+"\" weight=\"1"+ System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator +"0\"/>\n";
 			}
 		}
 		res += "	</tiles>\n<neighbors>";
